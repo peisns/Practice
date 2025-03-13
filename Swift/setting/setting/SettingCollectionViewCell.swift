@@ -56,12 +56,54 @@ class SettingsCollectionViewCell: UICollectionViewCell {
         case .toggle:
             toggleSwitch.isHidden = false
             toggleSwitch.isOn = item.isEnabled ?? false
-        case .push, .alert:
+        case .push, .alert, .button: // .button은 이 셀에서 사용되지 않음, 안전하게 처리
             toggleSwitch.isHidden = true
         }
     }
     
     @objc private func toggleChanged() {
         toggleAction?(toggleSwitch.isOn)
+    }
+}
+
+
+class ButtonCollectionViewCell: UICollectionViewCell {
+    static let identifier = "ButtonCollectionViewCell"
+    
+    private let button: UIButton = {
+        let btn = UIButton(type: .system)
+        btn.translatesAutoresizingMaskIntoConstraints = false
+        return btn
+    }()
+    
+    private var tapAction: (() -> Void)?
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        setupUI()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setupUI() {
+        contentView.addSubview(button)
+        NSLayoutConstraint.activate([
+            button.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            button.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            button.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor, constant: 8),
+            button.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor, constant: -8)
+        ])
+        button.addTarget(self, action: #selector(buttonTapped), for: .touchUpInside)
+    }
+    
+    func configure(with item: SettingsItem, action: @escaping () -> Void) {
+        button.setTitle(item.title, for: .normal)
+        tapAction = action
+    }
+    
+    @objc private func buttonTapped() {
+        tapAction?()
     }
 }

@@ -22,6 +22,7 @@ class ViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.register(SettingsCollectionViewCell.self, forCellWithReuseIdentifier: SettingsCollectionViewCell.identifier)
+        collectionView.register(ButtonCollectionViewCell.self, forCellWithReuseIdentifier: ButtonCollectionViewCell.identifier)
         collectionView.register(UICollectionViewCell.self, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "Header")
         return collectionView
     }()
@@ -55,15 +56,29 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SettingsCollectionViewCell.identifier, for: indexPath) as! SettingsCollectionViewCell
         let item = viewModel.getItem(at: indexPath)
         
-        cell.configure(with: item)
-        cell.toggleAction = { [weak self] isOn in
-            self?.viewModel.toggleItem(at: indexPath)
+        switch item.type {
+        case .toggle, .push, .alert:
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SettingsCollectionViewCell.identifier, for: indexPath) as! SettingsCollectionViewCell
+            cell.configure(with: item) // SettingsCollectionViewCell의 configure 사용
+            if item.type == .toggle {
+                cell.toggleAction = { [weak self] isOn in
+                    _ = self?.viewModel.toggleItem(at: indexPath) // 토글 상태 업데이트
+                    collectionView.reloadItems(at: [indexPath]) // 셀 리프레시
+                }
+            } else {
+                cell.toggleAction = nil // 토글이 아닌 경우 비활성화
+            }
+            return cell
+            
+        case .button:
+            let buttonCell = collectionView.dequeueReusableCell(withReuseIdentifier: "ButtonCollectionViewCell", for: indexPath) as! ButtonCollectionViewCell
+            buttonCell.configure(with: item) { [weak self] in
+                self?.viewModel.performButtonAction(at: indexPath)
+            }
+            return buttonCell
         }
-        
-        return cell
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
@@ -72,7 +87,7 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
         switch item.type {
         case .push:
             if let vcType = item.destinationVC {
-                let destinationVC = vcType.init()
+                let destinationVC = vcType.init() // UIViewController.Type에서 인스턴스 생성
                 navigationController?.pushViewController(destinationVC, animated: true)
             } else {
                 print("푸시 대상 뷰컨트롤러가 설정되지 않았습니다.")
@@ -82,27 +97,28 @@ extension ViewController: UICollectionViewDelegate, UICollectionViewDataSource {
             alert.addAction(UIAlertAction(title: "확인", style: .default, handler: nil))
             alert.addAction(UIAlertAction(title: "취소", style: .cancel, handler: nil))
             present(alert, animated: true)
-        case .toggle:
-            break // 토글은 셀에서 처리
+        case .toggle, .button:
+            break // 토글과 버튼은 셀 내부에서 처리
         }
     }
-    
-    
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if kind == UICollectionView.elementKindSectionHeader {
             let header = collectionView.dequeueReusableSupplementaryView(ofKind: kind, withReuseIdentifier: "Header", for: indexPath)
             header.subviews.forEach { $0.removeFromSuperview() } // 재사용 시 기존 뷰 제거
             
-            let label = UILabel()
-            label.text = viewModel.getSectionTitle(at: indexPath.section)
-            label.font = .boldSystemFont(ofSize: 16)
-            label.translatesAutoresizingMaskIntoConstraints = false
-            header.addSubview(label)
-            
-            NSLayoutConstraint.activate([
-                label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 16),
-                label.centerYAnchor.constraint(equalTo: header.centerYAnchor)
-            ])
+            let sectionTitle = viewModel.getSectionTitle(at: indexPath.section)
+            if !sectionTitle.isEmpty { // 빈 제목은 헤더 표시 안 함
+                let label = UILabel()
+                label.text = sectionTitle
+                label.font = .boldSystemFont(ofSize: 16)
+                label.translatesAutoresizingMaskIntoConstraints = false
+                header.addSubview(label)
+                
+                NSLayoutConstraint.activate([
+                    label.leadingAnchor.constraint(equalTo: header.leadingAnchor, constant: 16),
+                    label.centerYAnchor.constraint(equalTo: header.centerYAnchor)
+                ])
+            }
             
             return header
         }
