@@ -1,5 +1,12 @@
 
 public class GradeOutput {
+	int e;
+	int m;
+	
+	void input_grade(int a, int b) {
+		e = a;
+		m = b;
+	} 
 
 	public static void main(String[] args) {
 		Grade g1, g2;
@@ -12,3 +19,4 @@ public class GradeOutput {
 		g2.output_grad();
 	}
 }
+
