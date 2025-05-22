@@ -12,6 +12,7 @@ class ViewController: UIViewController {
         case full
         case half
         case halfEnd
+        case weekly
     }
     enum Section: Hashable {
         case first
@@ -39,7 +40,13 @@ class ViewController: UIViewController {
     
     @IBAction func firstButtonClicked(_ sender: UIButton) {
 //        //확정
-        collectionView.setContentOffset(.zero, animated: false)
+        let lastIndexPathItem = collectionView.indexPathsForVisibleItems.max { $0.item < $1.item }!.item
+        
+        if lastIndexPathItem > tempSecondItems.count / 2 {
+            collectionView.scrollToItem(at: .init(item: tempSecondItems.count/2, section: 0), at: .bottom, animated: false)
+        }
+        
+//        collectionView.setContentOffset(.zero, animated: false)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { [weak self] in
             guard let self else { return }
             var snapshot = dataSource.snapshot()
@@ -65,6 +72,40 @@ class ViewController: UIViewController {
         }
     }
     
+    @IBAction func thirdButtonClicked(_ sender: UIButton) {
+//        let topRect = CGRect.init(origin: collectionView.contentOffset, size: collectionView.bounds.size)
+//        let topPoint = CGPoint.init(x: topRect.minX, y: topRect.minY + 1 + 300)
+//        let topIndex = collectionView.indexPathForItem(at: topPoint) ?? .init(item: 0, section: 0)
+//        collectionView.scrollToItem(at: .init(item: 0, section: 0), at: .top, animated: false)
+//        
+//        DispatchQueue.main.asyncAfter(deadline: .now() + 0.0001) { [weak self] in
+//            guard let self else { return }
+//            collectionView.setCollectionViewLayout(createBasicListLayout(viewType: .weekly), animated: true)
+//            collectionView.scrollToItem(at: topIndex, at: .top, animated: false)
+//        }
+        
+        let topOffsety = collectionView.contentOffset.y
+        UIView.animate(withDuration: 0.2, animations: { [weak self] in
+            guard let self else { return }
+            collectionView.collectionViewLayout = createBasicListLayout(viewType: .weekly)
+            collectionView.setContentOffset(.init(x: 0, y: topOffsety), animated: false)
+            collectionView.collectionViewLayout.invalidateLayout()
+            collectionView.layoutIfNeeded()
+        })
+
+    }
+    
+    @IBAction func fourthButtonClicked(_ sender: UIButton) {
+        let topOffsety = collectionView.contentOffset.y
+
+        UIView.animate(withDuration: 0.2, animations: { [weak self] in
+            guard let self else { return }
+            collectionView.collectionViewLayout = createBasicListLayout(viewType: .halfEnd)
+            collectionView.setContentOffset(.init(x: 0, y: topOffsety), animated: false)
+            collectionView.collectionViewLayout.invalidateLayout()
+            collectionView.layoutIfNeeded()
+        })
+    }
     func configureCollectionView() {
         // 1. layout 등록. "셀들을 어떻게"
         collectionView.collectionViewLayout = createBasicFullListLayout()
@@ -132,6 +173,7 @@ extension ViewController {
         case .full: return createBasicFullListLayout()
         case .half: return createBasicHalfListLayout()
         case .halfEnd: return .init(section: createHalfSectionLayout())
+        case .weekly: return .init(section: createWeeklySectionLayout())
         }
     }
     
@@ -253,6 +295,32 @@ extension ViewController {
         
         return section
     }
+    
+    func createWeeklySectionLayout() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                             heightDimension: .fractionalHeight(1.0))
+        
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+      
+        let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0),
+                                              heightDimension: .absolute(44))
+        
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize,
+                                                         subitems: [item])
+        
+        let section = NSCollectionLayoutSection(group: group)
+        
+        let headerSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1),
+                                                heightDimension: .absolute(100))
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(layoutSize: headerSize,
+                                                                        elementKind: UICollectionView.elementKindSectionHeader,
+                                                                        alignment: .top)
+        sectionHeader.pinToVisibleBounds = true
+        section.boundarySupplementaryItems = [sectionHeader]
+        
+        return section
+    }
+
 
 }
 

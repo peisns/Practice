@@ -41,7 +41,7 @@
                                 <rect key="frame" x="0.0" y="59" width="393" height="40"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="rPN-fY-DdQ">
-                                        <rect key="frame" x="0.0" y="0.0" width="196.66666666666666" height="40"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="98.333333333333329" height="40"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Button"/>
                                         <connections>
@@ -49,11 +49,27 @@
                                         </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="erf-If-JM8">
-                                        <rect key="frame" x="196.66666666666663" y="0.0" width="196.33333333333337" height="40"/>
+                                        <rect key="frame" x="98.333333333333343" y="0.0" width="98.333333333333343" height="40"/>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="plain" title="Button"/>
                                         <connections>
                                             <action selector="secondButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="jwH-MW-P84"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Z0a-1h-k2z">
+                                        <rect key="frame" x="196.66666666666666" y="0.0" width="97.999999999999972" height="40"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                        <connections>
+                                            <action selector="thirdButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="GPb-GU-rd2"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="nCV-gb-uRu">
+                                        <rect key="frame" x="294.66666666666669" y="0.0" width="98.333333333333314" height="40"/>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="plain" title="Button"/>
+                                        <connections>
+                                            <action selector="fourthButtonClicked:" destination="BYZ-38-t0r" eventType="touchUpInside" id="QjY-Za-POY"/>
                                         </connections>
                                     </button>
                                 </subviews>
